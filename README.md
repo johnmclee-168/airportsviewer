@@ -23,6 +23,24 @@ npm install        # installs dependencies and the Husky git hooks
 npm run dev        # http://localhost:3000
 ```
 
+## Data source and local mock
+
+The browser never calls the Qantas API directly (it sends no CORS headers). Instead the
+app calls its own route handler, `GET /api/airports`, which fetches the upstream data on
+the server, normalises it and returns `{ airports: Airport[] }`.
+
+| Env var                  | Values           | Effect                                                         |
+| ------------------------ | ---------------- | -------------------------------------------------------------- |
+| `AIRPORTS_SOURCE`        | `live` (default) | Fetch https://api.qantas.com/flight/refData/airport (cached 1h) |
+|                          | `mock`           | Serve the local snapshot in `mocks/airports.json`              |
+| `AIRPORTS_MOCK_DELAY_MS` | number           | Add artificial latency (useful to see the loader)              |
+
+```bash
+npm run dev:mock                                # dev server backed by the snapshot
+AIRPORTS_MOCK_DELAY_MS=3000 npm run dev:mock    # ...with a slow API
+npm run mock:refresh                            # re-snapshot the real endpoint
+```
+
 ## Scripts
 
 | Script                  | What it does                                  |
@@ -34,6 +52,8 @@ npm run dev        # http://localhost:3000
 | `npm run test:coverage` | Unit tests with a coverage report             |
 | `npm run lint`          | ESLint                                        |
 | `npm run typecheck`     | TypeScript without emitting                   |
+| `npm run dev:mock`      | Dev server using the local mock API           |
+| `npm run mock:refresh`  | Re-download the real API into the mock        |
 
 ## Commit conventions
 
