@@ -53,7 +53,9 @@ describe("getTimezoneInfo", () => {
   });
 
   it("handles daylight-saving differences", () => {
-    expect(getTimezoneInfo("Australia/Sydney", new Date("2026-07-15T00:00:00Z")).offset).toBe("GMT+10");
+    expect(getTimezoneInfo("Australia/Sydney", new Date("2026-07-15T00:00:00Z")).offset).toBe(
+      "GMT+10",
+    );
   });
 
   it("degrades gracefully for unknown zones", () => {

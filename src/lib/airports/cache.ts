@@ -39,7 +39,9 @@ export const memoryStore = (): AirportsStore => {
 
 function isCachedAirports(value: unknown): value is CachedAirports {
   const candidate = value as CachedAirports | null;
-  return Boolean(candidate && Array.isArray(candidate.airports) && typeof candidate.savedAt === "number");
+  return Boolean(
+    candidate && Array.isArray(candidate.airports) && typeof candidate.savedAt === "number",
+  );
 }
 
 export function createCacheStorageStore(cacheStorage: CacheStorage): AirportsStore {
@@ -59,7 +61,10 @@ export function createCacheStorageStore(cacheStorage: CacheStorage): AirportsSto
       try {
         const cache = await cacheStorage.open(AIRPORTS_CACHE_NAME);
         const body = JSON.stringify({ airports, savedAt } satisfies CachedAirports);
-        await cache.put(CACHE_KEY, new Response(body, { headers: { "Content-Type": "application/json" } }));
+        await cache.put(
+          CACHE_KEY,
+          new Response(body, { headers: { "Content-Type": "application/json" } }),
+        );
       } catch {
         // Quota exceeded or storage disabled (e.g. private mode): caching is best-effort.
       }

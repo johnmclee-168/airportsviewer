@@ -59,7 +59,10 @@ describe("getAirports (live)", () => {
 
   it("throws an UpstreamError on a non-OK status", async () => {
     mockFetch(async () => new Response("nope", { status: 503 }));
-    await expect(getAirports(liveEnv)).rejects.toMatchObject({ name: "UpstreamError", status: 503 });
+    await expect(getAirports(liveEnv)).rejects.toMatchObject({
+      name: "UpstreamError",
+      status: 503,
+    });
   });
 
   it("throws an UpstreamError when the network fails", async () => {

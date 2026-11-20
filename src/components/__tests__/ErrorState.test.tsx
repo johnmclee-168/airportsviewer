@@ -13,7 +13,9 @@ describe("ErrorState", () => {
   });
 
   it("offers technical details when available", () => {
-    render(<ErrorState error={new AirportsError("server", "upstream 503", 502)} onRetry={jest.fn()} />);
+    render(
+      <ErrorState error={new AirportsError("server", "upstream 503", 502)} onRetry={jest.fn()} />,
+    );
     expect(screen.getByText(/technical details/i)).toBeInTheDocument();
     expect(screen.getByText("502: upstream 503")).toBeInTheDocument();
   });

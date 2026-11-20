@@ -17,7 +17,15 @@
  * It also remembers the selected airport (highlighted in the list) and the
  * current search text.
  */
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createDefaultStore, type AirportsStore } from "@/lib/airports/cache";
 import { AirportsError, fetchAirports, toAirportsError } from "@/lib/airports/client";
 import type { Airport } from "@/lib/airports/types";
@@ -74,7 +82,11 @@ const initialData: DataState = {
   isFetching: true,
 };
 
-export function AirportsProvider({ children, loader = fetchAirports, store }: AirportsProviderProps) {
+export function AirportsProvider({
+  children,
+  loader = fetchAirports,
+  store,
+}: AirportsProviderProps) {
   const [data, setData] = useState<DataState>(initialData);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [query, setQuery] = useState("");

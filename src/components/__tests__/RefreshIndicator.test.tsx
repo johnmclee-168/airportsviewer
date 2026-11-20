@@ -18,7 +18,9 @@ describe("RefreshIndicator", () => {
     const request = deferred<Airport[]>();
     renderWithAirports(<RefreshIndicator />, { store, loader: () => request.promise });
 
-    expect(await screen.findByRole("progressbar", { name: /refreshing airports/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("progressbar", { name: /refreshing airports/i }),
+    ).toBeInTheDocument();
     await act(async () => request.resolve(airports));
     await waitFor(() => expect(screen.queryByRole("progressbar")).not.toBeInTheDocument());
   });

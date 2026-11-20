@@ -22,8 +22,15 @@ export function ConnectivityBanner() {
       role="status"
       className="mb-3 flex animate-fade-in-up items-center gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100"
     >
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 shrink-0 fill-none stroke-current stroke-2">
-        <path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0" strokeLinecap="round" />
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="h-5 w-5 shrink-0 fill-none stroke-current stroke-2"
+      >
+        <path
+          d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0"
+          strokeLinecap="round"
+        />
         <path d="M12 19h.01" strokeLinecap="round" />
         {!online && <path d="M3 3l18 18" strokeLinecap="round" />}
       </svg>
@@ -53,5 +60,7 @@ export function ConnectivityBanner() {
 /** Relative "saved …" time; only mounted while the banner is visible (it reads the clock). */
 function SavedAgo({ timestamp }: { timestamp: number }) {
   const now = useNow(60_000).getTime();
-  return <time dateTime={new Date(timestamp).toISOString()}>{formatRelativeTime(timestamp, now)}</time>;
+  return (
+    <time dateTime={new Date(timestamp).toISOString()}>{formatRelativeTime(timestamp, now)}</time>
+  );
 }

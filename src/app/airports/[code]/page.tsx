@@ -10,9 +10,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 
 export default function AirportPage() {
   return (
-    <Suspense
-      fallback={<LoadingScreen label="Loading airport…" skeletonRows={0} />}
-    >
+    <Suspense fallback={<LoadingScreen label="Loading airport…" skeletonRows={0} />}>
       <AirportDetailScreen />
     </Suspense>
   );

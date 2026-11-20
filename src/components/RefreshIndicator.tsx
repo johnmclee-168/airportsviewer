@@ -16,7 +16,7 @@ export function RefreshIndicator() {
       aria-label="Refreshing airports"
       className="fixed inset-x-0 top-14 z-30 h-0.5 overflow-hidden bg-brand-soft"
     >
-      <div className="h-full w-full origin-left bg-brand animate-indeterminate" />
+      <div className="h-full w-full origin-left animate-indeterminate bg-brand" />
     </div>
   );
 }

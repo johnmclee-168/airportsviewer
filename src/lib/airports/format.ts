@@ -47,7 +47,11 @@ export interface TimezoneInfo {
   localTime: string | null;
 }
 
-export function getTimezoneInfo(timeZone: string, now: Date = new Date(), locale = "en-AU"): TimezoneInfo {
+export function getTimezoneInfo(
+  timeZone: string,
+  now: Date = new Date(),
+  locale = "en-AU",
+): TimezoneInfo {
   try {
     const offset =
       new Intl.DateTimeFormat(locale, { timeZone, timeZoneName: "shortOffset" })

@@ -35,7 +35,10 @@ describe("AirportList", () => {
 
   it("links each airport to its detail page", async () => {
     renderWithAirports(<AirportList />);
-    expect(await screen.findByRole("link", { name: /sydney/i })).toHaveAttribute("href", "/airports/SYD");
+    expect(await screen.findByRole("link", { name: /sydney/i })).toHaveAttribute(
+      "href",
+      "/airports/SYD",
+    );
   });
 
   it("highlights the airport that was tapped", async () => {
@@ -59,13 +62,17 @@ describe("AirportList", () => {
     await user.type(await screen.findByRole("searchbox"), "heathrow");
 
     await waitFor(() =>
-      expect(within(screen.getByRole("list", { name: "Airports" })).getAllByRole("link")).toHaveLength(1),
+      expect(
+        within(screen.getByRole("list", { name: "Airports" })).getAllByRole("link"),
+      ).toHaveLength(1),
     );
     expect(screen.getByText("1 of 3")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /clear search/i }));
     await waitFor(() =>
-      expect(within(screen.getByRole("list", { name: "Airports" })).getAllByRole("link")).toHaveLength(3),
+      expect(
+        within(screen.getByRole("list", { name: "Airports" })).getAllByRole("link"),
+      ).toHaveLength(3),
     );
   });
 

@@ -18,7 +18,12 @@ export interface AirportListItemProps {
   enterDelayMs?: number;
 }
 
-function AirportListItemComponent({ airport, selected, onSelect, enterDelayMs = 0 }: AirportListItemProps) {
+function AirportListItemComponent({
+  airport,
+  selected,
+  onSelect,
+  enterDelayMs = 0,
+}: AirportListItemProps) {
   return (
     <li className="animate-fade-in-up" style={{ animationDelay: `${enterDelayMs}ms` }}>
       <Link

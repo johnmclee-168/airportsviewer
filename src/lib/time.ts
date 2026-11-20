@@ -7,7 +7,11 @@ const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
   ["minute", 60_000],
 ];
 
-export function formatRelativeTime(timestamp: number, now: number = Date.now(), locale = "en-AU"): string {
+export function formatRelativeTime(
+  timestamp: number,
+  now: number = Date.now(),
+  locale = "en-AU",
+): string {
   const elapsed = now - timestamp;
   if (elapsed < 60_000) return "just now";
   const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });

@@ -47,7 +47,7 @@ export function AirportList() {
   }
 
   return (
-    <section aria-labelledby="airports-heading" className="flex flex-col gap-3 animate-fade-in">
+    <section aria-labelledby="airports-heading" className="flex animate-fade-in flex-col gap-3">
       <div className="flex items-baseline justify-between gap-2">
         <h1 id="airports-heading" className="text-2xl font-semibold tracking-tight">
           Airports

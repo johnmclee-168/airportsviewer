@@ -29,7 +29,7 @@ export function SearchBox({ value, onChange }: SearchBoxProps) {
         placeholder="Search name, city, country or code"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-12 w-full appearance-none rounded-xl border [&::-webkit-search-cancel-button]:appearance-none border-border bg-surface pr-10 pl-10 text-base shadow-sm outline-none placeholder:text-muted focus:border-brand focus:ring-2 focus:ring-brand/20"
+        className="h-12 w-full appearance-none rounded-xl border border-border bg-surface pr-10 pl-10 text-base shadow-sm outline-none placeholder:text-muted focus:border-brand focus:ring-2 focus:ring-brand/20 [&::-webkit-search-cancel-button]:appearance-none"
       />
       {value && (
         <button

@@ -101,12 +101,12 @@ calls its own route handler, `GET /api/airports`, which fetches the upstream dat
 server, normalises it and returns `{ airports: Airport[] }`. On failure it returns
 `502 { error }`.
 
-| Env var                     | Values           | Effect                                                    |
-| --------------------------- | ---------------- | --------------------------------------------------------- |
-| `AIRPORTS_SOURCE`           | `live` (default) | Fetch the Qantas endpoint (kept in memory for 1h)         |
-|                             | `mock`           | Serve the local snapshot in `mocks/airports.json`         |
-| `AIRPORTS_MOCK_DELAY_MS`    | number           | Add artificial latency (useful to see the loader)         |
-| `AIRPORTS_SIMULATE_FAILURE` | `1`              | Every request fails with 503 (to see the error UI)        |
+| Env var                     | Values           | Effect                                             |
+| --------------------------- | ---------------- | -------------------------------------------------- |
+| `AIRPORTS_SOURCE`           | `live` (default) | Fetch the Qantas endpoint (kept in memory for 1h)  |
+|                             | `mock`           | Serve the local snapshot in `mocks/airports.json`  |
+| `AIRPORTS_MOCK_DELAY_MS`    | number           | Add artificial latency (useful to see the loader)  |
+| `AIRPORTS_SIMULATE_FAILURE` | `1`              | Every request fails with 503 (to see the error UI) |
 
 ```bash
 AIRPORTS_MOCK_DELAY_MS=5000 npm run dev:mock    # slow API: see the loading animation

@@ -12,7 +12,9 @@ describe("AirportDetail", () => {
 
   it("shows the airport identity and type badges", () => {
     render(<AirportDetail airport={sydney} onBack={jest.fn()} />);
-    expect(screen.getByRole("heading", { level: 1, name: "Sydney (Kingsford Smith)" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Sydney (Kingsford Smith)" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("SYD")).toBeInTheDocument();
     expect(screen.getByText("Sydney, Australia")).toBeInTheDocument();
     const badges = within(screen.getByRole("list", { name: "Airport type" }));
@@ -58,7 +60,9 @@ describe("AirportDetail", () => {
     const location = within(screen.getByRole("region", { name: "Location" }));
     expect(location.getByText("Not available")).toBeInTheDocument();
     expect(location.queryByRole("link")).not.toBeInTheDocument();
-    expect(within(screen.getByRole("region", { name: "Currency" })).getByText(/no official currency/i)).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("region", { name: "Currency" })).getByText(/no official currency/i),
+    ).toBeInTheDocument();
   });
 
   it("calls onBack from both back controls", async () => {

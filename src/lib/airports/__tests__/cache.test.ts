@@ -1,4 +1,9 @@
-import { AIRPORTS_CACHE_NAME, createCacheStorageStore, createDefaultStore, memoryStore } from "../cache";
+import {
+  AIRPORTS_CACHE_NAME,
+  createCacheStorageStore,
+  createDefaultStore,
+  memoryStore,
+} from "../cache";
 import { airports } from "@/test/fixtures";
 
 /** Minimal in-memory CacheStorage double (jsdom has no Cache Storage API). */

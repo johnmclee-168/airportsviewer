@@ -43,7 +43,7 @@ export function AirportDetail({ airport, onBack }: AirportDetailProps) {
     .join(", ");
 
   return (
-    <article aria-labelledby="airport-name" className="flex flex-col gap-4 animate-slide-in-right">
+    <article aria-labelledby="airport-name" className="flex animate-slide-in-right flex-col gap-4">
       <BackLink onBack={onBack} />
 
       <header className="overflow-hidden rounded-2xl bg-brand text-white shadow-md">
@@ -97,7 +97,12 @@ export function AirportDetail({ airport, onBack }: AirportDetailProps) {
           <p className="mt-2 font-mono text-sm break-all">{timezone.id}</p>
         </DetailCard>
 
-        <DetailCard title="Location" icon={<PinIcon />} className="sm:col-span-2" enterDelayMs={200}>
+        <DetailCard
+          title="Location"
+          icon={<PinIcon />}
+          className="sm:col-span-2"
+          enterDelayMs={200}
+        >
           {airport.location ? (
             <dl className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
               <Field label="Latitude" value={formatLatitude(airport.location.latitude)} />
@@ -168,7 +173,7 @@ function DetailCard({
   return (
     <section
       aria-label={title}
-      className={`rounded-2xl border border-border bg-surface p-5 shadow-sm animate-fade-in-up ${className}`}
+      className={`animate-fade-in-up rounded-2xl border border-border bg-surface p-5 shadow-sm ${className}`}
       style={{ animationDelay: `${enterDelayMs}ms` }}
     >
       <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold tracking-wide text-muted uppercase">

@@ -5,11 +5,7 @@
 import type { Airport } from "./types";
 
 export function foldText(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .trim();
+  return value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 }
 
 export function filterAirports(airports: Airport[], query: string): Airport[] {

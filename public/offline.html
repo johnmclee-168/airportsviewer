@@ -6,14 +6,50 @@
     <meta name="theme-color" content="#e40000" />
     <title>Offline · Airports Viewer</title>
     <style>
-      body { margin: 0; font-family: system-ui, sans-serif; background: #f5f5f4; color: #1c1917; }
-      header { background: #e40000; color: #fff; padding: 16px; font-weight: 600; font-size: 18px; }
-      main { max-width: 480px; margin: 32px auto; padding: 0 16px; text-align: center; }
-      .card { background: #fff; border: 1px solid #e7e5e4; border-radius: 16px; padding: 32px 24px; }
-      a { display: inline-block; margin-top: 16px; background: #e40000; color: #fff; padding: 12px 20px; border-radius: 12px; text-decoration: none; font-weight: 500; }
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #f5f5f4;
+        color: #1c1917;
+      }
+      header {
+        background: #e40000;
+        color: #fff;
+        padding: 16px;
+        font-weight: 600;
+        font-size: 18px;
+      }
+      main {
+        max-width: 480px;
+        margin: 32px auto;
+        padding: 0 16px;
+        text-align: center;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #e7e5e4;
+        border-radius: 16px;
+        padding: 32px 24px;
+      }
+      a {
+        display: inline-block;
+        margin-top: 16px;
+        background: #e40000;
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 500;
+      }
       @media (prefers-color-scheme: dark) {
-        body { background: #0c0a09; color: #f5f5f4; }
-        .card { background: #1c1917; border-color: #292524; }
+        body {
+          background: #0c0a09;
+          color: #f5f5f4;
+        }
+        .card {
+          background: #1c1917;
+          border-color: #292524;
+        }
       }
     </style>
   </head>
@@ -22,7 +58,10 @@
     <main>
       <div class="card">
         <h1>You're offline</h1>
-        <p>This page hasn't been saved for offline use yet. Saved airports are still available from the list.</p>
+        <p>
+          This page hasn't been saved for offline use yet. Saved airports are still available from
+          the list.
+        </p>
         <a href="/">Go to airports</a>
       </div>
     </main>

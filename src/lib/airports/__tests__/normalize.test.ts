@@ -1,5 +1,11 @@
 import { normalizeAirport, normalizeAirports } from "../normalize";
-import { rawAirports, rawArrabury, rawLondon, rawSydney, rawUnknownLocation } from "@/test/fixtures";
+import {
+  rawAirports,
+  rawArrabury,
+  rawLondon,
+  rawSydney,
+  rawUnknownLocation,
+} from "@/test/fixtures";
 
 describe("normalizeAirport", () => {
   it("maps the core identity fields", () => {
@@ -19,7 +25,10 @@ describe("normalizeAirport", () => {
   });
 
   it("derives signed decimal degrees from the radian fields", () => {
-    expect(normalizeAirport(rawSydney).location).toEqual({ latitude: -33.9306, longitude: 151.1692 });
+    expect(normalizeAirport(rawSydney).location).toEqual({
+      latitude: -33.9306,
+      longitude: 151.1692,
+    });
     // Western hemisphere: longitude must be negative.
     expect(normalizeAirport(rawLondon).location?.longitude).toBeLessThan(0);
     expect(normalizeAirport(rawLondon).location?.latitude).toBeGreaterThan(0);

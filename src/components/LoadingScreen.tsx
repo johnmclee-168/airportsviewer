@@ -18,7 +18,10 @@ export interface LoadingScreenProps {
   skeletonRows?: number;
 }
 
-export function LoadingScreen({ label = "Loading airports…", skeletonRows = 6 }: LoadingScreenProps) {
+export function LoadingScreen({
+  label = "Loading airports…",
+  skeletonRows = 6,
+}: LoadingScreenProps) {
   const [stage, setStage] = useState<0 | 1 | 2>(0);
 
   useEffect(() => {
@@ -37,12 +40,16 @@ export function LoadingScreen({ label = "Loading airports…", skeletonRows = 6 
   ][stage];
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in">
-      <div role="status" aria-live="polite" className="flex flex-col items-center gap-4 pt-8 text-center">
+    <div className="flex animate-fade-in flex-col gap-6">
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex flex-col items-center gap-4 pt-8 text-center"
+      >
         <PlaneSpinner />
         <p className="text-lg font-medium">{label}</p>
         <p className="min-h-[2.5rem] max-w-xs text-sm text-muted">
-          {hint && <span className="animate-fade-in-up block">{hint}</span>}
+          {hint && <span className="block animate-fade-in-up">{hint}</span>}
         </p>
       </div>
       {skeletonRows > 0 && <SkeletonList rows={skeletonRows} />}
@@ -53,14 +60,25 @@ export function LoadingScreen({ label = "Loading airports…", skeletonRows = 6 
 function PlaneSpinner() {
   return (
     <div aria-hidden="true" className="relative h-24 w-24">
-      <div className="absolute inset-4 rounded-full bg-brand-soft animate-pulse-soft" />
+      <div className="absolute inset-4 animate-pulse-soft rounded-full bg-brand-soft" />
       <svg viewBox="0 0 48 48" className="absolute inset-4 h-16 w-16 text-brand/40">
         <circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        <ellipse cx="24" cy="24" rx="10" ry="22" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        <ellipse
+          cx="24"
+          cy="24"
+          rx="10"
+          ry="22"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
         <path d="M2 24h44M6 13h36M6 35h36" fill="none" stroke="currentColor" strokeWidth="1.5" />
       </svg>
       <div className="absolute inset-0 animate-orbit">
-        <svg viewBox="0 0 24 24" className="absolute top-0 left-1/2 h-7 w-7 -translate-x-1/2 rotate-90 fill-brand">
+        <svg
+          viewBox="0 0 24 24"
+          className="absolute top-0 left-1/2 h-7 w-7 -translate-x-1/2 rotate-90 fill-brand"
+        >
           <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" />
         </svg>
       </div>

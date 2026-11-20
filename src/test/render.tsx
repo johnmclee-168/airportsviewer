@@ -14,7 +14,11 @@ export interface ProviderRenderOptions extends Omit<RenderOptions, "wrapper"> {
 
 export function renderWithAirports(
   ui: React.ReactElement,
-  { loader = async () => defaultAirports, store = memoryStore(), ...options }: ProviderRenderOptions = {},
+  {
+    loader = async () => defaultAirports,
+    store = memoryStore(),
+    ...options
+  }: ProviderRenderOptions = {},
 ) {
   return render(ui, {
     wrapper: ({ children }) => (

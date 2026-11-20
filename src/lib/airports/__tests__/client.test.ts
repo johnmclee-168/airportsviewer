@@ -58,13 +58,19 @@ describe("fetchAirports", () => {
 
   it("reports a network failure", async () => {
     global.fetch = jest.fn().mockRejectedValue(new TypeError("Failed to fetch"));
-    await expect(fetchAirports()).rejects.toMatchObject({ kind: "network", detail: "Failed to fetch" });
+    await expect(fetchAirports()).rejects.toMatchObject({
+      kind: "network",
+      detail: "Failed to fetch",
+    });
   });
 
   it("reports offline without calling the network", async () => {
     setOnline(false);
     global.fetch = jest.fn();
-    await expect(fetchAirports()).rejects.toMatchObject({ kind: "offline", title: "You're offline" });
+    await expect(fetchAirports()).rejects.toMatchObject({
+      kind: "offline",
+      title: "You're offline",
+    });
     expect(global.fetch).not.toHaveBeenCalled();
   });
 

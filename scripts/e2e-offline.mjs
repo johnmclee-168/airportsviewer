@@ -148,7 +148,11 @@ try {
 
   await goto(`${BASE}/airports/LHR`);
   const fallback = await bodyText();
-  check("offline: unvisited page shows offline fallback", /hasn't been saved/i.test(fallback), fallback);
+  check(
+    "offline: unvisited page shows offline fallback",
+    /hasn't been saved/i.test(fallback),
+    fallback,
+  );
 } catch (error) {
   failures.push(String(error));
   console.error(error);

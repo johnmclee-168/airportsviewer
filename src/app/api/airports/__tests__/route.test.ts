@@ -25,7 +25,9 @@ describe("GET /api/airports", () => {
   });
 
   it("returns 502 with the upstream message when the API fails", async () => {
-    mockedGetAirports.mockRejectedValue(new UpstreamError("Airports service responded with 503", 503));
+    mockedGetAirports.mockRejectedValue(
+      new UpstreamError("Airports service responded with 503", 503),
+    );
     const response = await GET();
     expect(response.status).toBe(502);
     expect(await response.json()).toEqual({ error: "Airports service responded with 503" });

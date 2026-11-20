@@ -30,7 +30,9 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key.startsWith("airports-") && ![SHELL_CACHE, ASSET_CACHE].includes(key))
+            .filter(
+              (key) => key.startsWith("airports-") && ![SHELL_CACHE, ASSET_CACHE].includes(key),
+            )
             .map((key) => caches.delete(key)),
         ),
       )
@@ -78,7 +80,10 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(networkFirst(request, { fallbackUrl: OFFLINE_URL }));
   } else if (isRscRequest(request, url)) {
     event.respondWith(networkFirst(request));
-  } else if (url.pathname.startsWith("/_next/static/") || /\.(?:ico|png|svg|woff2?)$/.test(url.pathname)) {
+  } else if (
+    url.pathname.startsWith("/_next/static/") ||
+    /\.(?:ico|png|svg|woff2?)$/.test(url.pathname)
+  ) {
     event.respondWith(cacheFirst(request));
   }
 });

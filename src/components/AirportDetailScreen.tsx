@@ -53,7 +53,7 @@ export function AirportDetailScreen() {
 
   if (!airport) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-12 text-center animate-fade-in-up">
+      <div className="flex animate-fade-in-up flex-col items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-12 text-center">
         <h1 className="text-xl font-semibold">Airport not found</h1>
         <p className="text-muted">We couldn’t find an airport with the code “{code}”.</p>
         <button

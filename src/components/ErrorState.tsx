@@ -18,7 +18,7 @@ export function ErrorState({ error, onRetry, children }: ErrorStateProps) {
   return (
     <div
       role="alert"
-      className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface px-6 py-10 text-center shadow-sm animate-fade-in-up"
+      className="flex animate-fade-in-up flex-col items-center gap-3 rounded-2xl border border-border bg-surface px-6 py-10 text-center shadow-sm"
     >
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft text-brand">
         {error.kind === "offline" ? <OfflineIcon /> : <WarningIcon />}
@@ -62,7 +62,10 @@ function WarningIcon() {
 function OfflineIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className={iconClass}>
-      <path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0" strokeLinecap="round" />
+      <path
+        d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0"
+        strokeLinecap="round"
+      />
       <path d="M12 19h.01M3 3l18 18" strokeLinecap="round" />
     </svg>
   );
