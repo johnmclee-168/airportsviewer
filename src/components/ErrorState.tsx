@@ -18,7 +18,7 @@ export function ErrorState({ error, onRetry, children }: ErrorStateProps) {
   return (
     <div
       role="alert"
-      className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface px-6 py-10 text-center shadow-sm"
+      className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface px-6 py-10 text-center shadow-sm animate-fade-in-up"
     >
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft text-brand">
         {error.kind === "offline" ? <OfflineIcon /> : <WarningIcon />}

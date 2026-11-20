@@ -6,15 +6,12 @@
  */
 import { Suspense } from "react";
 import { AirportDetailScreen } from "@/components/AirportDetailScreen";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 export default function AirportPage() {
   return (
     <Suspense
-      fallback={
-        <p role="status" className="py-10 text-center text-muted">
-          Loading airport…
-        </p>
-      }
+      fallback={<LoadingScreen label="Loading airport…" skeletonRows={0} />}
     >
       <AirportDetailScreen />
     </Suspense>

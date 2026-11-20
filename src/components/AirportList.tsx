@@ -14,9 +14,18 @@ import { filterAirports } from "@/lib/airports/filter";
 import type { Airport } from "@/lib/airports/types";
 import { AirportListItem } from "./AirportListItem";
 import { ErrorState } from "./ErrorState";
+import { LoadingScreen } from "./LoadingScreen";
 import { SearchBox } from "./SearchBox";
 
 export const PAGE_SIZE = 50;
+const STAGGERED_ROWS = 12;
+const STAGGER_STEP_MS = 25;
+
+/** Rows cascade in as each page appears; rows beyond the first dozen appear at once. */
+function staggerDelay(index: number): number {
+  const positionInPage = index % PAGE_SIZE;
+  return positionInPage < STAGGERED_ROWS ? positionInPage * STAGGER_STEP_MS : 0;
+}
 
 export function AirportList() {
   const { status, airports, error, reload, selectedCode, selectAirport, query, setQuery } =
@@ -30,11 +39,7 @@ export function AirportList() {
   );
 
   if (status === "loading") {
-    return (
-      <p role="status" className="py-10 text-center text-muted">
-        Loading airports…
-      </p>
-    );
+    return <LoadingScreen />;
   }
 
   if (status === "error" && error) {
@@ -42,7 +47,7 @@ export function AirportList() {
   }
 
   return (
-    <section aria-labelledby="airports-heading" className="flex flex-col gap-3">
+    <section aria-labelledby="airports-heading" className="flex flex-col gap-3 animate-fade-in">
       <div className="flex items-baseline justify-between gap-2">
         <h1 id="airports-heading" className="text-2xl font-semibold tracking-tight">
           Airports
@@ -111,12 +116,13 @@ function AirportResults({ results, selectedCode, onSelect }: AirportResultsProps
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
       <ul ref={listRef} aria-label="Airports" className="divide-y divide-border">
-        {results.slice(0, limit).map((airport) => (
+        {results.slice(0, limit).map((airport, index) => (
           <AirportListItem
             key={airport.code}
             airport={airport}
             selected={airport.code === selectedCode}
             onSelect={onSelect}
+            enterDelayMs={staggerDelay(index)}
           />
         ))}
       </ul>

@@ -14,18 +14,20 @@ export interface AirportListItemProps {
   airport: Airport;
   selected: boolean;
   onSelect: (airport: Airport) => void;
+  /** Entrance animation delay, used to cascade rows in. */
+  enterDelayMs?: number;
 }
 
-function AirportListItemComponent({ airport, selected, onSelect }: AirportListItemProps) {
+function AirportListItemComponent({ airport, selected, onSelect, enterDelayMs = 0 }: AirportListItemProps) {
   return (
-    <li>
+    <li className="animate-fade-in-up" style={{ animationDelay: `${enterDelayMs}ms` }}>
       <Link
         href={`/airports/${encodeURIComponent(airport.code)}`}
         onClick={() => onSelect(airport)}
         aria-current={selected ? "true" : undefined}
         data-code={airport.code}
         className={[
-          "group flex w-full items-center gap-3 border-l-4 px-4 py-3 text-left transition-colors",
+          "group flex w-full items-center gap-3 border-l-4 px-4 py-3 text-left transition-colors duration-200",
           "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand",
           selected
             ? "border-brand bg-brand-soft"
@@ -34,7 +36,7 @@ function AirportListItemComponent({ airport, selected, onSelect }: AirportListIt
       >
         <span
           className={[
-            "flex h-10 w-12 shrink-0 items-center justify-center rounded-lg font-mono text-sm font-semibold",
+            "flex h-10 w-12 shrink-0 items-center justify-center rounded-lg font-mono text-sm font-semibold transition-colors duration-200",
             selected ? "bg-brand text-white" : "bg-background text-foreground",
           ].join(" ")}
         >

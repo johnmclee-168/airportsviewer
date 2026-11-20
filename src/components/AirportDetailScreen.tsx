@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useAirports } from "@/context/AirportsProvider";
 import { AirportDetail } from "./AirportDetail";
 import { ErrorState } from "./ErrorState";
+import { LoadingScreen } from "./LoadingScreen";
 
 export function AirportDetailScreen() {
   const params = useParams<{ code: string }>();
@@ -33,11 +34,7 @@ export function AirportDetailScreen() {
   }, [router]);
 
   if (status === "loading") {
-    return (
-      <p role="status" className="py-10 text-center text-muted">
-        Loading airport…
-      </p>
-    );
+    return <LoadingScreen label="Loading airport…" skeletonRows={0} />;
   }
 
   if (status === "error" && error) {
@@ -56,7 +53,7 @@ export function AirportDetailScreen() {
 
   if (!airport) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-12 text-center">
+      <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-12 text-center animate-fade-in-up">
         <h1 className="text-xl font-semibold">Airport not found</h1>
         <p className="text-muted">We couldn’t find an airport with the code “{code}”.</p>
         <button

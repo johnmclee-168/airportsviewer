@@ -16,6 +16,8 @@ const config: Config = {
     "src/**/*.{ts,tsx}",
     "!src/**/*.d.ts",
     "!src/app/layout.tsx",
+    "!src/test/**",
+    "!src/**/types.ts",
   ],
 };
 

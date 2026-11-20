@@ -5,6 +5,7 @@
  * name, city, country, airport type badges) followed by cards for currency,
  * timezone (with live local time) and location (DMS + decimal coordinates,
  * elevation, region, Google Maps link). A full-width button returns to the list.
+ * The page slides in from the right and the cards cascade in after it.
  */
 import type { ReactNode } from "react";
 import { useNow } from "@/hooks/useNow";
@@ -42,7 +43,7 @@ export function AirportDetail({ airport, onBack }: AirportDetailProps) {
     .join(", ");
 
   return (
-    <article aria-labelledby="airport-name" className="flex flex-col gap-4">
+    <article aria-labelledby="airport-name" className="flex flex-col gap-4 animate-slide-in-right">
       <BackLink onBack={onBack} />
 
       <header className="overflow-hidden rounded-2xl bg-brand text-white shadow-md">
@@ -69,7 +70,7 @@ export function AirportDetail({ airport, onBack }: AirportDetailProps) {
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <DetailCard title="Currency" icon={<CurrencyIcon />}>
+        <DetailCard title="Currency" icon={<CurrencyIcon />} enterDelayMs={80}>
           {currency ? (
             <>
               <p className="text-3xl font-semibold">
@@ -85,7 +86,7 @@ export function AirportDetail({ airport, onBack }: AirportDetailProps) {
           )}
         </DetailCard>
 
-        <DetailCard title="Timezone" icon={<ClockIcon />}>
+        <DetailCard title="Timezone" icon={<ClockIcon />} enterDelayMs={140}>
           <p className="text-3xl font-semibold" aria-label="Local time">
             {timezone.localTime?.split(", ").pop() ?? "—"}
           </p>
@@ -96,7 +97,7 @@ export function AirportDetail({ airport, onBack }: AirportDetailProps) {
           <p className="mt-2 font-mono text-sm break-all">{timezone.id}</p>
         </DetailCard>
 
-        <DetailCard title="Location" icon={<PinIcon />} className="sm:col-span-2">
+        <DetailCard title="Location" icon={<PinIcon />} className="sm:col-span-2" enterDelayMs={200}>
           {airport.location ? (
             <dl className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
               <Field label="Latitude" value={formatLatitude(airport.location.latitude)} />
@@ -155,17 +156,20 @@ function DetailCard({
   title,
   icon,
   className = "",
+  enterDelayMs = 0,
   children,
 }: {
   title: string;
   icon: ReactNode;
   className?: string;
+  enterDelayMs?: number;
   children: ReactNode;
 }) {
   return (
     <section
       aria-label={title}
-      className={`rounded-2xl border border-border bg-surface p-5 shadow-sm ${className}`}
+      className={`rounded-2xl border border-border bg-surface p-5 shadow-sm animate-fade-in-up ${className}`}
+      style={{ animationDelay: `${enterDelayMs}ms` }}
     >
       <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold tracking-wide text-muted uppercase">
         <span className="text-brand">{icon}</span>
