@@ -15,7 +15,9 @@
     "test:coverage": "jest --coverage",
     "test:e2e-offline": "node scripts/e2e-offline.mjs",
     "mock:refresh": "node scripts/fetch-airports.mjs",
-    "prepare": "husky"
+    "prepare": "husky",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "next": "16.4.6",
@@ -36,10 +38,13 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
     "lint-staged": "^17.6.1",
+    "prettier": "^3.10.1",
+    "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "4.3.3",
     "ts-node": "^10.9.2",
     "typescript": "^5"
