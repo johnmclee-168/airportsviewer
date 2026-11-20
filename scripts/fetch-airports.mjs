@@ -27,5 +27,6 @@ if (!Array.isArray(airports)) {
 }
 
 await mkdir(dirname(OUTPUT), { recursive: true });
-await writeFile(OUTPUT, JSON.stringify(airports));
+// Pretty-print (2-space indent, trailing newline) so the snapshot matches Prettier's output.
+await writeFile(OUTPUT, `${JSON.stringify(airports, null, 2)}\n`);
 console.log(`Saved ${airports.length} airports to ${OUTPUT}`);

@@ -9,6 +9,3 @@ node_modules/
 next-env.d.ts
 package-lock.json
 tsconfig.tsbuildinfo
-
-# Large generated API snapshot (refresh with `npm run mock:refresh`)
-mocks/airports.json
