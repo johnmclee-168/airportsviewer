@@ -5,6 +5,8 @@ import { airports } from "@/test/fixtures";
 import { deferred, renderWithAirports } from "@/test/render";
 import type { Airport } from "@/lib/airports/types";
 
+jest.mock("next/link", () => jest.requireActual("@/test/mockNextLink"));
+
 function manyAirports(count: number): Airport[] {
   return Array.from({ length: count }, (_, i) => ({
     ...airports[0],
@@ -23,28 +25,31 @@ describe("AirportList", () => {
   it("lists every airport with its name and country", async () => {
     renderWithAirports(<AirportList />);
     const list = await screen.findByRole("list", { name: "Airports" });
-    const rows = within(list).getAllByRole("button");
+    const rows = within(list).getAllByRole("link");
     expect(rows).toHaveLength(3);
     expect(rows[2]).toHaveTextContent("Sydney (Kingsford Smith)");
     expect(rows[2]).toHaveTextContent("Australia");
     expect(screen.getByText("3 airports")).toBeInTheDocument();
   });
 
+  it("links each airport to its detail page", async () => {
+    renderWithAirports(<AirportList />);
+    expect(await screen.findByRole("link", { name: /sydney/i })).toHaveAttribute("href", "/airports/SYD");
+  });
+
   it("highlights the airport that was tapped", async () => {
     const user = userEvent.setup();
-    const onAirportSelected = jest.fn();
-    renderWithAirports(<AirportList onAirportSelected={onAirportSelected} />);
+    renderWithAirports(<AirportList />);
 
-    const sydney = await screen.findByRole("button", { name: /sydney/i });
+    const sydney = await screen.findByRole("link", { name: /sydney/i });
     expect(sydney).not.toHaveAttribute("aria-current");
     await user.click(sydney);
 
     expect(sydney).toHaveAttribute("aria-current", "true");
-    expect(onAirportSelected).toHaveBeenCalledWith(expect.objectContaining({ code: "SYD" }));
 
-    await user.click(screen.getByRole("button", { name: /london/i }));
+    await user.click(screen.getByRole("link", { name: /london/i }));
     expect(sydney).not.toHaveAttribute("aria-current");
-    expect(screen.getByRole("button", { name: /london/i })).toHaveAttribute("aria-current", "true");
+    expect(screen.getByRole("link", { name: /london/i })).toHaveAttribute("aria-current", "true");
   });
 
   it("filters the list as the user types and can clear the search", async () => {
@@ -53,13 +58,13 @@ describe("AirportList", () => {
     await user.type(await screen.findByRole("searchbox"), "heathrow");
 
     await waitFor(() =>
-      expect(within(screen.getByRole("list", { name: "Airports" })).getAllByRole("button")).toHaveLength(1),
+      expect(within(screen.getByRole("list", { name: "Airports" })).getAllByRole("link")).toHaveLength(1),
     );
     expect(screen.getByText("1 of 3")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /clear search/i }));
     await waitFor(() =>
-      expect(within(screen.getByRole("list", { name: "Airports" })).getAllByRole("button")).toHaveLength(3),
+      expect(within(screen.getByRole("list", { name: "Airports" })).getAllByRole("link")).toHaveLength(3),
     );
   });
 
@@ -76,13 +81,13 @@ describe("AirportList", () => {
     renderWithAirports(<AirportList />, { loader: async () => many });
 
     const list = await screen.findByRole("list", { name: "Airports" });
-    expect(within(list).getAllByRole("button")).toHaveLength(PAGE_SIZE);
+    expect(within(list).getAllByRole("link")).toHaveLength(PAGE_SIZE);
 
     await user.click(screen.getByRole("button", { name: /show more/i }));
-    expect(within(list).getAllByRole("button")).toHaveLength(PAGE_SIZE * 2);
+    expect(within(list).getAllByRole("link")).toHaveLength(PAGE_SIZE * 2);
 
     await user.click(screen.getByRole("button", { name: /show more/i }));
-    expect(within(list).getAllByRole("button")).toHaveLength(many.length);
+    expect(within(list).getAllByRole("link")).toHaveLength(many.length);
     expect(screen.queryByRole("button", { name: /show more/i })).not.toBeInTheDocument();
   });
 

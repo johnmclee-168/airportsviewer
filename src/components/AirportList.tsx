@@ -4,8 +4,9 @@
  * The master screen. Reads airports from AirportsProvider and renders a
  * searchable list of AirportListItem rows. With ~7,000 airports it renders
  * results in pages (auto-extended by an IntersectionObserver sentinel, with a
- * "Show more" button fallback). Tapping a row marks it as selected, which
- * highlights it; the selection is remembered and scrolled back into view.
+ * "Show more" button fallback). Tapping a row opens its detail page and marks it
+ * as selected; the selection is highlighted and scrolled back into view when
+ * the user returns.
  */
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useAirports } from "@/context/AirportsProvider";
@@ -16,23 +17,15 @@ import { SearchBox } from "./SearchBox";
 
 export const PAGE_SIZE = 50;
 
-export interface AirportListProps {
-  /** Called after an airport is selected (the detail stage navigates here). */
-  onAirportSelected?: (airport: Airport) => void;
-}
-
-export function AirportList({ onAirportSelected }: AirportListProps) {
+export function AirportList() {
   const { status, airports, error, reload, selectedCode, selectAirport, query, setQuery } =
     useAirports();
   const deferredQuery = useDeferredValue(query);
   const results = useMemo(() => filterAirports(airports, deferredQuery), [airports, deferredQuery]);
 
   const handleSelect = useCallback(
-    (airport: Airport) => {
-      selectAirport(airport.code);
-      onAirportSelected?.(airport);
-    },
-    [selectAirport, onAirportSelected],
+    (airport: Airport) => selectAirport(airport.code),
+    [selectAirport],
   );
 
   if (status === "loading") {

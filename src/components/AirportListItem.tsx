@@ -3,8 +3,10 @@
  * AirportListItem
  * One row in the airport list: airport name and country (as per the brief),
  * with the IATA code and city as secondary detail. The row is a full-width
- * tap target; the selected row is highlighted and marked aria-current.
+ * link to the airport detail page; the last tapped row is highlighted and
+ * marked aria-current so it stands out when the user returns to the list.
  */
+import Link from "next/link";
 import { memo } from "react";
 import type { Airport } from "@/lib/airports/types";
 
@@ -17,8 +19,8 @@ export interface AirportListItemProps {
 function AirportListItemComponent({ airport, selected, onSelect }: AirportListItemProps) {
   return (
     <li>
-      <button
-        type="button"
+      <Link
+        href={`/airports/${encodeURIComponent(airport.code)}`}
         onClick={() => onSelect(airport)}
         aria-current={selected ? "true" : undefined}
         data-code={airport.code}
@@ -54,7 +56,7 @@ function AirportListItemComponent({ airport, selected, onSelect }: AirportListIt
         >
           <path d="M7.3 4.3a1 1 0 0 1 1.4 0l5 5a1 1 0 0 1 0 1.4l-5 5a1 1 0 1 1-1.4-1.4L11.6 10 7.3 5.7a1 1 0 0 1 0-1.4z" />
         </svg>
-      </button>
+      </Link>
     </li>
   );
 }
