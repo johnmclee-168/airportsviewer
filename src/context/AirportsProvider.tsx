@@ -3,12 +3,13 @@
  * AirportsProvider
  * Client-side store for the airport list, mounted once in the root layout so the
  * data survives navigation between the list and detail pages. It fetches
- * /api/airports on mount, exposes the load status, a `reload` action, and the
+ * /api/airports on mount, exposes the load status, a typed error, a `reload`
+ * action (also triggered automatically when the browser comes back online), the
  * code of the most recently selected airport (used to highlight it in the list)
  * and the current search text.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { fetchAirports } from "@/lib/airports/client";
+import { AirportsError, fetchAirports, toAirportsError } from "@/lib/airports/client";
 import type { Airport } from "@/lib/airports/types";
 
 export type AirportsStatus = "loading" | "success" | "error";
@@ -16,7 +17,7 @@ export type AirportsStatus = "loading" | "success" | "error";
 export interface AirportsContextValue {
   status: AirportsStatus;
   airports: Airport[];
-  error: string | null;
+  error: AirportsError | null;
   reload: () => void;
   selectedCode: string | null;
   selectAirport: (code: string | null) => void;
@@ -36,7 +37,7 @@ export interface AirportsProviderProps {
 export function AirportsProvider({ children, loader = fetchAirports }: AirportsProviderProps) {
   const [status, setStatus] = useState<AirportsStatus>("loading");
   const [airports, setAirports] = useState<Airport[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AirportsError | null>(null);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [attempt, setAttempt] = useState(0);
@@ -53,7 +54,7 @@ export function AirportsProvider({ children, loader = fetchAirports }: AirportsP
       })
       .catch((err: unknown) => {
         if (controller.signal.aborted) return;
-        setError(err instanceof Error ? err.message : "Something went wrong");
+        setError(toAirportsError(err));
         setStatus("error");
       });
     return () => controller.abort();
@@ -64,6 +65,13 @@ export function AirportsProvider({ children, loader = fetchAirports }: AirportsP
     setError(null);
     setAttempt((n) => n + 1);
   }, []);
+
+  // Recover automatically when connectivity returns after a failed load.
+  useEffect(() => {
+    if (status !== "error") return;
+    window.addEventListener("online", reload);
+    return () => window.removeEventListener("online", reload);
+  }, [status, reload]);
 
   const value = useMemo<AirportsContextValue>(
     () => ({

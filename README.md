@@ -34,12 +34,31 @@ the server, normalises it and returns `{ airports: Airport[] }`.
 | `AIRPORTS_SOURCE`        | `live` (default) | Fetch https://api.qantas.com/flight/refData/airport (cached 1h) |
 |                          | `mock`           | Serve the local snapshot in `mocks/airports.json`              |
 | `AIRPORTS_MOCK_DELAY_MS` | number           | Add artificial latency (useful to see the loader)              |
+| `AIRPORTS_SIMULATE_FAILURE` | `1`          | Every request fails with 503 (to see the error UI)             |
 
 ```bash
 npm run dev:mock                                # dev server backed by the snapshot
 AIRPORTS_MOCK_DELAY_MS=3000 npm run dev:mock    # ...with a slow API
+npm run dev:fail                                # dev server whose API always fails
 npm run mock:refresh                            # re-snapshot the real endpoint
 ```
+
+## Error handling
+
+Failures are converted into a typed `AirportsError` (`src/lib/airports/client.ts`) with a
+`kind` so the UI can explain what happened in plain language:
+
+| Kind      | When                                              | Shown as                     |
+| --------- | ------------------------------------------------- | ---------------------------- |
+| `offline` | `navigator.onLine` is false                       | "You're offline"             |
+| `timeout` | No response within 20s                            | "This is taking too long"    |
+| `network` | `fetch` rejected (DNS, connection reset...)       | "Can't reach the server"     |
+| `server`  | Non-2xx from `/api/airports` (e.g. upstream down) | "Airports are unavailable"   |
+| `invalid` | Response body isn't the expected shape            | "Something went wrong"       |
+
+Every error state has a **Try again** button, technical details are tucked away in a
+disclosure, and a failed load is retried automatically when the browser fires `online`.
+Unexpected render errors are caught by `app/error.tsx`, and unknown URLs by `app/not-found.tsx`.
 
 ## Scripts
 
@@ -53,6 +72,7 @@ npm run mock:refresh                            # re-snapshot the real endpoint
 | `npm run lint`          | ESLint                                        |
 | `npm run typecheck`     | TypeScript without emitting                   |
 | `npm run dev:mock`      | Dev server using the local mock API           |
+| `npm run dev:fail`      | Dev server whose API always fails             |
 | `npm run mock:refresh`  | Re-download the real API into the mock        |
 
 ## Commit conventions

@@ -67,6 +67,15 @@ describe("getAirports (live)", () => {
     await expect(getAirports(liveEnv)).rejects.toBeInstanceOf(UpstreamError);
   });
 
+  it("can simulate a failure without calling the network", async () => {
+    const fetchSpy = mockFetch(async () => Response.json(rawAirports));
+    await expect(getAirports({ AIRPORTS_SIMULATE_FAILURE: "1" })).rejects.toMatchObject({
+      name: "UpstreamError",
+      status: 503,
+    });
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it("throws an UpstreamError on an unexpected payload", async () => {
     mockFetch(async () => Response.json({ not: "an array" }));
     await expect(getAirports(liveEnv)).rejects.toThrow(/unexpected payload/);

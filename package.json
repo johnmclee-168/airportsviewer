@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:mock": "AIRPORTS_SOURCE=mock next dev",
+    "dev:fail": "AIRPORTS_SOURCE=mock AIRPORTS_SIMULATE_FAILURE=1 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -11,9 +13,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "prepare": "husky",
-    "dev:mock": "AIRPORTS_SOURCE=mock next dev",
-    "mock:refresh": "node scripts/fetch-airports.mjs"
+    "mock:refresh": "node scripts/fetch-airports.mjs",
+    "prepare": "husky"
   },
   "dependencies": {
     "next": "16.4.6",

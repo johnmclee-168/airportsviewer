@@ -13,6 +13,7 @@ import { useAirports } from "@/context/AirportsProvider";
 import { filterAirports } from "@/lib/airports/filter";
 import type { Airport } from "@/lib/airports/types";
 import { AirportListItem } from "./AirportListItem";
+import { ErrorState } from "./ErrorState";
 import { SearchBox } from "./SearchBox";
 
 export const PAGE_SIZE = 50;
@@ -36,15 +37,8 @@ export function AirportList() {
     );
   }
 
-  if (status === "error") {
-    return (
-      <div role="alert" className="py-10 text-center">
-        <p>{error}</p>
-        <button type="button" onClick={reload} className="mt-3 font-medium text-brand underline">
-          Try again
-        </button>
-      </div>
-    );
+  if (status === "error" && error) {
+    return <ErrorState error={error} onRetry={reload} />;
   }
 
   return (

@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { AirportsProvider, useAirports } from "../AirportsProvider";
 import { airports } from "@/test/fixtures";
 import { deferred } from "@/test/render";
+import { AirportsError } from "@/lib/airports/client";
 import type { Airport } from "@/lib/airports/types";
 
 function setup(loader: (signal: AbortSignal) => Promise<Airport[]>) {
@@ -21,10 +22,32 @@ describe("AirportsProvider", () => {
     expect(result.current.airports).toEqual(airports);
   });
 
-  it("exposes the error message when loading fails", async () => {
-    const { result } = setup(() => Promise.reject(new Error("Service unavailable")));
+  it("exposes a typed error when loading fails", async () => {
+    const { result } = setup(() => Promise.reject(new AirportsError("server", "HTTP 503", 503)));
     await waitFor(() => expect(result.current.status).toBe("error"));
-    expect(result.current.error).toBe("Service unavailable");
+    expect(result.current.error).toMatchObject({ kind: "server", status: 503 });
+  });
+
+  it("wraps unexpected errors into an AirportsError", async () => {
+    const { result } = setup(() => Promise.reject(new Error("kaboom")));
+    await waitFor(() => expect(result.current.status).toBe("error"));
+    expect(result.current.error).toBeInstanceOf(AirportsError);
+    expect(result.current.error?.detail).toBe("kaboom");
+  });
+
+  it("retries automatically when the browser comes back online", async () => {
+    const loader = jest
+      .fn<Promise<Airport[]>, [AbortSignal]>()
+      .mockRejectedValueOnce(new AirportsError("offline"))
+      .mockResolvedValueOnce(airports);
+    const { result } = setup(loader);
+    await waitFor(() => expect(result.current.status).toBe("error"));
+
+    act(() => {
+      window.dispatchEvent(new Event("online"));
+    });
+    await waitFor(() => expect(result.current.status).toBe("success"));
+    expect(loader).toHaveBeenCalledTimes(2);
   });
 
   it("reload() retries the request", async () => {
@@ -43,6 +66,7 @@ describe("AirportsProvider", () => {
 
   it("remembers the selected airport and search query", async () => {
     const { result } = setup(async () => airports);
+    await waitFor(() => expect(result.current.status).toBe("success"));
     act(() => {
       result.current.selectAirport("SYD");
       result.current.setQuery("syd");

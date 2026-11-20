@@ -5,6 +5,7 @@ import { AirportDetailScreen } from "../AirportDetailScreen";
 import { useAirports } from "@/context/AirportsProvider";
 import { airports } from "@/test/fixtures";
 import { deferred, renderWithAirports } from "@/test/render";
+import { AirportsError } from "@/lib/airports/client";
 import type { Airport } from "@/lib/airports/types";
 
 jest.mock("next/navigation", () => ({ useParams: jest.fn(), useRouter: jest.fn() }));
@@ -71,12 +72,15 @@ describe("AirportDetailScreen", () => {
     expect(router.back).not.toHaveBeenCalled();
   });
 
-  it("shows the error with a retry when loading fails", async () => {
+  it("shows the error with retry and a way back to the list", async () => {
+    const user = userEvent.setup();
     visit("SYD");
     renderWithAirports(<AirportDetailScreen />, {
-      loader: () => Promise.reject(new Error("Service unavailable")),
+      loader: () => Promise.reject(new AirportsError("timeout")),
     });
-    expect(await screen.findByRole("alert")).toHaveTextContent("Service unavailable");
+    expect(await screen.findByRole("alert")).toHaveTextContent(/taking too long/i);
     expect(screen.getByRole("button", { name: /try again/i })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /all airports/i }));
+    expect(router.push).toHaveBeenCalledWith("/");
   });
 });

@@ -6,6 +6,8 @@
  * - "mock": the local snapshot in mocks/airports.json (see `npm run mock:refresh`)
  *
  * AIRPORTS_MOCK_DELAY_MS adds artificial latency (handy for checking the loader).
+ * AIRPORTS_SIMULATE_FAILURE=1 makes every request fail with a 503 (to exercise
+ * the API-failure UI without touching the network).
  */
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -18,7 +20,7 @@ const UPSTREAM_TIMEOUT_MS = 15_000;
 
 export type AirportSource = "live" | "mock";
 
-/** Environment variables (AIRPORTS_SOURCE, AIRPORTS_MOCK_DELAY_MS) the data source reads. */
+/** Environment variables (AIRPORTS_*) the data source reads. */
 export type SourceEnv = Record<string, string | undefined>;
 
 export class UpstreamError extends Error {
@@ -71,6 +73,9 @@ export async function getAirports(env: SourceEnv = process.env): Promise<Airport
   const source = resolveSource(env);
   const mockDelay = Number(env.AIRPORTS_MOCK_DELAY_MS ?? 0);
   if (mockDelay > 0) await delay(mockDelay);
+  if (env.AIRPORTS_SIMULATE_FAILURE === "1") {
+    throw new UpstreamError("Simulated failure (AIRPORTS_SIMULATE_FAILURE=1)", 503);
+  }
 
   if (source === "mock") return normalizeAirports(await loadMock());
 

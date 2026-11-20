@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useAirports } from "@/context/AirportsProvider";
 import { AirportDetail } from "./AirportDetail";
+import { ErrorState } from "./ErrorState";
 
 export function AirportDetailScreen() {
   const params = useParams<{ code: string }>();
@@ -39,14 +40,17 @@ export function AirportDetailScreen() {
     );
   }
 
-  if (status === "error") {
+  if (status === "error" && error) {
     return (
-      <div role="alert" className="py-10 text-center">
-        <p>{error}</p>
-        <button type="button" onClick={reload} className="mt-3 font-medium text-brand underline">
-          Try again
+      <ErrorState error={error} onRetry={reload}>
+        <button
+          type="button"
+          onClick={() => router.push("/")}
+          className="h-11 rounded-xl border border-border px-6 font-medium hover:bg-background"
+        >
+          All airports
         </button>
-      </div>
+      </ErrorState>
     );
   }
 

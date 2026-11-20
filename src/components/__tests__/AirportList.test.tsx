@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { AirportList, PAGE_SIZE } from "../AirportList";
 import { airports } from "@/test/fixtures";
 import { deferred, renderWithAirports } from "@/test/render";
+import { AirportsError } from "@/lib/airports/client";
 import type { Airport } from "@/lib/airports/types";
 
 jest.mock("next/link", () => jest.requireActual("@/test/mockNextLink"));
@@ -95,11 +96,11 @@ describe("AirportList", () => {
     const user = userEvent.setup();
     const loader = jest
       .fn<Promise<Airport[]>, [AbortSignal]>()
-      .mockRejectedValueOnce(new Error("Service unavailable"))
+      .mockRejectedValueOnce(new AirportsError("server", "HTTP 503", 503))
       .mockResolvedValueOnce(airports);
     renderWithAirports(<AirportList />, { loader });
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Service unavailable");
+    expect(await screen.findByRole("alert")).toHaveTextContent(/airports are unavailable/i);
     await user.click(screen.getByRole("button", { name: /try again/i }));
     expect(await screen.findByRole("list", { name: "Airports" })).toBeInTheDocument();
   });
