@@ -60,6 +60,31 @@ Every error state has a **Try again** button, technical details are tucked away 
 disclosure, and a failed load is retried automatically when the browser fires `online`.
 Unexpected render errors are caught by `app/error.tsx`, and unknown URLs by `app/not-found.tsx`.
 
+## Offline support and caching
+
+Two layers keep the app usable without a network connection:
+
+1. **Airport data cache** (`src/lib/airports/cache.ts`). Every successful response is saved,
+   with its timestamp, in the browser's Cache Storage (the ~2.6 MB payload is too large for
+   localStorage). On start-up the cached list is shown instantly while a fresh copy is fetched
+   (stale-while-revalidate). If the refresh fails, the cached airports stay on screen and a
+   banner says how old they are ("You're offline. Showing airports saved 5 minutes ago."),
+   with a Retry button when online. Only with no cache at all does the full error screen
+   appear. Failed loads refresh automatically when the browser comes back online.
+2. **Service worker** (`public/sw.js`, production builds only). It caches the app shell so the
+   app can be reopened offline: pages and RSC payloads are network-first with a cache fallback,
+   hashed build assets are cache-first, and pages never visited fall back to `/offline.html`.
+   `/api/*` is left to the data cache above so the UI knows the data's age.
+
+To try it: `npm run build && AIRPORTS_SOURCE=mock npm start`, open http://localhost:3000, then
+in Chrome DevTools > Network choose **Offline** and reload, search, and open airports. The
+same flow is automated (headless Chrome via the DevTools protocol):
+
+```bash
+npm run build
+npm run test:e2e-offline
+```
+
 ## Scripts
 
 | Script                  | What it does                                  |
@@ -69,6 +94,7 @@ Unexpected render errors are caught by `app/error.tsx`, and unknown URLs by `app
 | `npm start`             | Serve the production build                    |
 | `npm test`              | Run the unit tests                            |
 | `npm run test:coverage` | Unit tests with a coverage report             |
+| `npm run test:e2e-offline` | Offline end-to-end check (needs a build + Chrome) |
 | `npm run lint`          | ESLint                                        |
 | `npm run typecheck`     | TypeScript without emitting                   |
 | `npm run dev:mock`      | Dev server using the local mock API           |

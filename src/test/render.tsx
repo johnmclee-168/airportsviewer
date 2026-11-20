@@ -3,19 +3,25 @@
  */
 import { render, type RenderOptions } from "@testing-library/react";
 import { AirportsProvider } from "@/context/AirportsProvider";
+import { memoryStore, type AirportsStore } from "@/lib/airports/cache";
 import type { Airport } from "@/lib/airports/types";
 import { airports as defaultAirports } from "./fixtures";
 
 export interface ProviderRenderOptions extends Omit<RenderOptions, "wrapper"> {
   loader?: (signal: AbortSignal) => Promise<Airport[]>;
+  store?: AirportsStore;
 }
 
 export function renderWithAirports(
   ui: React.ReactElement,
-  { loader = async () => defaultAirports, ...options }: ProviderRenderOptions = {},
+  { loader = async () => defaultAirports, store = memoryStore(), ...options }: ProviderRenderOptions = {},
 ) {
   return render(ui, {
-    wrapper: ({ children }) => <AirportsProvider loader={loader}>{children}</AirportsProvider>,
+    wrapper: ({ children }) => (
+      <AirportsProvider loader={loader} store={store}>
+        {children}
+      </AirportsProvider>
+    ),
     ...options,
   });
 }
