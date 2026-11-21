@@ -4,6 +4,7 @@
 import {
   getAirports,
   QANTAS_AIRPORTS_URL,
+  describeSource,
   resetAirportsMemo,
   resolveSource,
   resolveUpstreamUrl,
@@ -43,6 +44,20 @@ describe("resolveUpstreamUrl", () => {
     expect(resolveUpstreamUrl({ AIRPORTS_UPSTREAM_URL: "http://localhost:4000/x" })).toBe(
       "http://localhost:4000/x",
     );
+  });
+});
+
+describe("describeSource", () => {
+  it("names the live Qantas API by default", () => {
+    expect(describeSource({})).toBe(`live ${QANTAS_AIRPORTS_URL}`);
+  });
+
+  it("names the mock, a custom upstream and a simulated failure", () => {
+    expect(describeSource({ AIRPORTS_SOURCE: "mock" })).toBe("mock mocks/airports.json");
+    expect(describeSource({ AIRPORTS_UPSTREAM_URL: "http://localhost:4000/x" })).toBe(
+      "upstream http://localhost:4000/x",
+    );
+    expect(describeSource({ AIRPORTS_SIMULATE_FAILURE: "1" })).toBe("simulated-failure");
   });
 });
 

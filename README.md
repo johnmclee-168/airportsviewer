@@ -47,6 +47,12 @@ npm start          # http://localhost:3000
 
 The service worker (offline app shell) is only registered in production builds.
 
+Production always uses the live Qantas API by default. The committed `.env.production`
+sets `AIRPORTS_SOURCE=live`, an empty `AIRPORTS_UPSTREAM_URL`, no delay and no simulated
+failure, and it takes priority over any `.env` file used for local work. Variables set in
+the shell (or in `.env.production.local`) still win, so a mock can be chosen on purpose,
+for example `AIRPORTS_SOURCE=mock npm start` (which `npm run test:e2e-offline` relies on).
+
 ### Run the tests
 
 ```bash
@@ -117,6 +123,18 @@ server, normalises it and returns `{ airports: Airport[] }`. On failure it retur
 AIRPORTS_MOCK_DELAY_MS=5000 npm run dev:mock    # slow API: see the loading animation
 npm run dev:fail                                # failing API: see the error UI
 ```
+
+To see which source is in use, open the browser console. Every airports request is logged
+with the source the server reports in its `X-Airports-Source` response header:
+
+```text
+[airports] GET /api/airports started
+[airports] GET /api/airports -> 200 in 245ms, 7189 airports (source: live https://api.qantas.com/flight/refData/airport)
+```
+
+The source is `live <url>` for the Qantas API, `mock mocks/airports.json`, `upstream <url>`
+for a custom URL such as the Express mock server, or `simulated-failure`. The browser never
+calls `api.qantas.com` itself, so the Network tab only ever shows `/api/airports`.
 
 ### Express mock API server (simulate a slow API)
 

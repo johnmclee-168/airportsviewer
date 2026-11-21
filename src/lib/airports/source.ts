@@ -56,6 +56,18 @@ export function resolveUpstreamUrl(env: SourceEnv = process.env): string {
   return env.AIRPORTS_UPSTREAM_URL?.trim() || QANTAS_AIRPORTS_URL;
 }
 
+/**
+ * Human-readable description of the data source the current env selects, e.g.
+ * "live https://api.qantas.com/flight/refData/airport" or "mock mocks/airports.json".
+ * The /api/airports route sends it in the X-Airports-Source header for debugging.
+ */
+export function describeSource(env: SourceEnv = process.env): string {
+  if (env.AIRPORTS_SIMULATE_FAILURE === "1") return "simulated-failure";
+  if (resolveSource(env) === "mock") return "mock mocks/airports.json";
+  const url = resolveUpstreamUrl(env);
+  return url === QANTAS_AIRPORTS_URL ? `live ${url}` : `upstream ${url}`;
+}
+
 async function loadLive(url: string): Promise<RawAirport[]> {
   let response: Response;
   try {

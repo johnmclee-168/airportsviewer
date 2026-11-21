@@ -4,6 +4,12 @@
  * Every failure is converted into an `AirportsError` with a `kind`, so the UI
  * can show a specific, human-friendly message (offline vs. timeout vs. server
  * error) instead of a raw exception.
+ *
+ * Each request is logged to the browser console with its status, duration and
+ * the server's data source (the X-Airports-Source header), e.g.
+ *   [airports] GET /api/airports -> 200 in 412ms, 7189 airports
+ *              (source: live https://api.qantas.com/flight/refData/airport)
+ * The browser itself never calls the Qantas API; the server route does.
  */
 import type { Airport } from "./types";
 
@@ -50,6 +56,15 @@ export class AirportsError extends Error {
   }
 }
 
+/** Header the /api/airports route sets to name its data source (see describeSource). */
+export const SOURCE_HEADER = "X-Airports-Source";
+
+/** Console logging for each request; silent under Jest to keep test output clean. */
+function log(level: "info" | "warn", message: string): void {
+  if (process.env.NODE_ENV === "test") return;
+  console[level](`[airports] ${message}`);
+}
+
 function isOffline(): boolean {
   return typeof navigator !== "undefined" && navigator.onLine === false;
 }
@@ -60,6 +75,10 @@ export async function fetchAirports(signal?: AbortSignal): Promise<Airport[]> {
   const timeout = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
   const combined = signal ? AbortSignal.any([signal, timeout]) : timeout;
 
+  const started = performance.now();
+  const elapsed = () => `${Math.round(performance.now() - started)}ms`;
+  log("info", `GET ${AIRPORTS_ENDPOINT} started`);
+
   let response: Response;
   try {
     response = await fetch(AIRPORTS_ENDPOINT, {
@@ -67,6 +86,7 @@ export async function fetchAirports(signal?: AbortSignal): Promise<Airport[]> {
       headers: { Accept: "application/json" },
     });
   } catch (error) {
+    log("warn", `GET ${AIRPORTS_ENDPOINT} failed after ${elapsed()}: ${String(error)}`);
     // A caller-initiated abort is not an error the UI should report.
     if (signal?.aborted) throw error;
     if (timeout.aborted) throw new AirportsError("timeout");
@@ -74,7 +94,11 @@ export async function fetchAirports(signal?: AbortSignal): Promise<Airport[]> {
     throw new AirportsError("network", error instanceof Error ? error.message : String(error));
   }
 
+  // Optional chaining: logging must never break loading, even with a minimal Response.
+  const source = `(source: ${response.headers?.get(SOURCE_HEADER) ?? "unknown"})`;
+
   if (!response.ok) {
+    log("warn", `GET ${AIRPORTS_ENDPOINT} -> ${response.status} in ${elapsed()} ${source}`);
     const body = (await response.json().catch(() => null)) as { error?: string } | null;
     throw new AirportsError(
       "server",
@@ -85,8 +109,14 @@ export async function fetchAirports(signal?: AbortSignal): Promise<Airport[]> {
 
   const body = (await response.json().catch(() => null)) as { airports?: unknown } | null;
   if (!body || !Array.isArray(body.airports)) {
+    log("warn", `GET ${AIRPORTS_ENDPOINT} -> invalid payload in ${elapsed()} ${source}`);
     throw new AirportsError("invalid", "Response did not contain an airports array");
   }
+  log(
+    "info",
+    `GET ${AIRPORTS_ENDPOINT} -> ${response.status} in ${elapsed()}, ` +
+      `${body.airports.length} airports ${source}`,
+  );
   return body.airports as Airport[];
 }
 

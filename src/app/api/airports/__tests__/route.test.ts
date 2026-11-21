@@ -21,6 +21,7 @@ describe("GET /api/airports", () => {
     mockedGetAirports.mockResolvedValue(airports);
     const response = await GET();
     expect(response.status).toBe(200);
+    expect(response.headers.get("X-Airports-Source")).toMatch(/^(live|mock|upstream) /);
     expect(await response.json()).toEqual({ airports });
   });
 
@@ -30,6 +31,7 @@ describe("GET /api/airports", () => {
     );
     const response = await GET();
     expect(response.status).toBe(502);
+    expect(response.headers.get("X-Airports-Source")).toBeTruthy();
     expect(await response.json()).toEqual({ error: "Airports service responded with 503" });
   });
 
