@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+/* Design tokens: Qantas-inspired red accent on a calm neutral surface. */
+:root {
+  --background: #f5f5f4;
+  --surface: #ffffff;
+  --foreground: #1c1917;
+  --muted: #78716c;
+  --border: #e7e5e4;
+  --brand: #e40000;
+  --brand-strong: #b80000;
+  --brand-soft: #fdecec;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0c0a09;
+    --surface: #1c1917;
+    --foreground: #f5f5f4;
+    --muted: #a8a29e;
+    --border: #292524;
+    --brand: #ff3b3b;
+    --brand-strong: #ff6b6b;
+    --brand-soft: #3b1212;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Motion */
+  --animate-fade-in: fade-in 240ms ease-out both;
+  --animate-fade-in-up: fade-in-up 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-slide-in-right: slide-in-right 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-shimmer: shimmer 1.4s linear infinite;
+  --animate-orbit: orbit 1.6s linear infinite;
+  --animate-indeterminate: indeterminate 1.2s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 1.6s ease-in-out infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+  @keyframes orbit {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes indeterminate {
+    0% {
+      transform: translateX(-100%) scaleX(0.3);
+    }
+    50% {
+      transform: translateX(30%) scaleX(0.6);
+    }
+    100% {
+      transform: translateX(100%) scaleX(0.3);
+    }
+  }
+  @keyframes pulse-soft {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+}
+
+/* Skeleton placeholder with a moving highlight. */
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--background) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+  border-radius: 0.375rem;
+}
+
+/* Respect users who prefer less motion: keep state changes, drop the movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
