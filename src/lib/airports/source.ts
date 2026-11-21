@@ -8,6 +8,9 @@
  * AIRPORTS_MOCK_DELAY_MS adds artificial latency (handy for checking the loader).
  * AIRPORTS_SIMULATE_FAILURE=1 makes every request fail with a 503 (to exercise
  * the API-failure UI without touching the network).
+ * AIRPORTS_UPSTREAM_URL replaces the Qantas endpoint for the "live" source, e.g. the
+ * local Express mock (`npm run mock:server`). Responses from a custom upstream are
+ * not memoised, so every request sees its configured response time.
  */
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -48,10 +51,15 @@ async function loadMock(): Promise<RawAirport[]> {
   return JSON.parse(await readFile(file, "utf8")) as RawAirport[];
 }
 
-async function loadLive(): Promise<RawAirport[]> {
+/** The upstream airports URL: AIRPORTS_UPSTREAM_URL if set, otherwise the Qantas API. */
+export function resolveUpstreamUrl(env: SourceEnv = process.env): string {
+  return env.AIRPORTS_UPSTREAM_URL?.trim() || QANTAS_AIRPORTS_URL;
+}
+
+async function loadLive(url: string): Promise<RawAirport[]> {
   let response: Response;
   try {
-    response = await fetch(QANTAS_AIRPORTS_URL, {
+    response = await fetch(url, {
       headers: { Accept: "application/json" },
       signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
       cache: "no-store",
@@ -79,9 +87,12 @@ export async function getAirports(env: SourceEnv = process.env): Promise<Airport
 
   if (source === "mock") return normalizeAirports(await loadMock());
 
-  if (memo && memo.expiresAt > Date.now()) return memo.airports;
-  const airports = normalizeAirports(await loadLive());
-  memo = { airports, expiresAt: Date.now() + CACHE_TTL_MS };
+  const url = resolveUpstreamUrl(env);
+  // Only memoise the real API; a custom upstream (the mock server) is hit every time.
+  const memoise = url === QANTAS_AIRPORTS_URL;
+  if (memoise && memo && memo.expiresAt > Date.now()) return memo.airports;
+  const airports = normalizeAirports(await loadLive(url));
+  if (memoise) memo = { airports, expiresAt: Date.now() + CACHE_TTL_MS };
   return airports;
 }
 

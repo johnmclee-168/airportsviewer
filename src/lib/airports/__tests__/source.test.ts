@@ -6,6 +6,7 @@ import {
   QANTAS_AIRPORTS_URL,
   resetAirportsMemo,
   resolveSource,
+  resolveUpstreamUrl,
   UpstreamError,
   type SourceEnv,
 } from "../source";
@@ -32,6 +33,19 @@ describe("resolveSource", () => {
   });
 });
 
+describe("resolveUpstreamUrl", () => {
+  it("defaults to the Qantas API", () => {
+    expect(resolveUpstreamUrl({})).toBe(QANTAS_AIRPORTS_URL);
+    expect(resolveUpstreamUrl({ AIRPORTS_UPSTREAM_URL: "  " })).toBe(QANTAS_AIRPORTS_URL);
+  });
+
+  it("uses AIRPORTS_UPSTREAM_URL when set", () => {
+    expect(resolveUpstreamUrl({ AIRPORTS_UPSTREAM_URL: "http://localhost:4000/x" })).toBe(
+      "http://localhost:4000/x",
+    );
+  });
+});
+
 describe("getAirports (mock)", () => {
   it("reads and normalises the local snapshot", async () => {
     const fetchSpy = mockFetch(() => Promise.reject(new Error("should not be called")));
@@ -55,6 +69,16 @@ describe("getAirports (live)", () => {
     await getAirports(liveEnv);
     await getAirports(liveEnv);
     expect(fetchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("fetches a custom upstream every time instead of memoising it", async () => {
+    const url = "http://localhost:4000/flight/refData/airport";
+    const fetchSpy = mockFetch(async () => Response.json(rawAirports));
+    const env: SourceEnv = { ...liveEnv, AIRPORTS_UPSTREAM_URL: url };
+    await getAirports(env);
+    await getAirports(env);
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(fetchSpy).toHaveBeenCalledWith(url, expect.any(Object));
   });
 
   it("throws an UpstreamError on a non-OK status", async () => {

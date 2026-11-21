@@ -62,6 +62,9 @@ npm run build && npm run test:e2e-offline   # offline end-to-end check in headle
 | `npm run dev`              | Dev server on http://localhost:3000 (live API)    |
 | `npm run dev:mock`         | Dev server using the local mock API               |
 | `npm run dev:fail`         | Dev server whose API always fails                 |
+| `npm run mock:server`      | Express mock of the Qantas API on port 4000       |
+| `npm run mock:build-alt`   | Rebuild the alt dataset for the mock server       |
+| `npm run dev:mock-server`  | Dev server that fetches from the Express mock     |
 | `npm run build`            | Production build (also type-checks)               |
 | `npm start`                | Serve the production build                        |
 | `npm test`                 | Run the unit tests                                |
@@ -89,7 +92,8 @@ src/
   test/                      Fixtures and render helpers
 public/sw.js, offline.html   Service worker and offline fallback page
 mocks/airports.json          Snapshot of the real API (npm run mock:refresh)
-scripts/                     Mock snapshot and offline e2e scripts
+mocks/airports-alt.json      Alt dataset for the mock server (npm run mock:build-alt)
+scripts/                     Mock snapshot, Express mock API server and offline e2e scripts
 ```
 
 ## How it works
@@ -107,11 +111,106 @@ server, normalises it and returns `{ airports: Airport[] }`. On failure it retur
 |                             | `mock`           | Serve the local snapshot in `mocks/airports.json`  |
 | `AIRPORTS_MOCK_DELAY_MS`    | number           | Add artificial latency (useful to see the loader)  |
 | `AIRPORTS_SIMULATE_FAILURE` | `1`              | Every request fails with 503 (to see the error UI) |
+| `AIRPORTS_UPSTREAM_URL`     | URL              | Fetch this URL instead of the Qantas endpoint      |
 
 ```bash
 AIRPORTS_MOCK_DELAY_MS=5000 npm run dev:mock    # slow API: see the loading animation
 npm run dev:fail                                # failing API: see the error UI
 ```
+
+### Express mock API server (simulate a slow API)
+
+`scripts/mock-api-server.mjs` is a small Express server that stands in for the Qantas API.
+It serves mock airports at the same path as the real endpoint, `GET /flight/refData/airport`,
+and waits a set time before each response. Unlike `AIRPORTS_SOURCE=mock`, the app goes
+through its real network code (`fetch`, timeout and error handling), so it is the closest
+local copy of a slow upstream.
+
+It can serve two datasets, so you can tell which response is on screen:
+
+| Dataset | File                      | Contents                                                     |
+| ------- | ------------------------- | ------------------------------------------------------------ |
+| `full`  | `mocks/airports.json`     | Snapshot of the real API: 7,189 airports                     |
+| `alt`   | `mocks/airports-alt.json` | Australia and New Zealand only (578), names end with `(alt)` |
+
+With `alt`, the list header reads "578 airports" instead of "7,189 airports" and every name
+is tagged, for example "Sydney (Kingsford Smith) (alt)". `alt` is built from the full
+snapshot by `npm run mock:build-alt`; run it again after `npm run mock:refresh`.
+
+| Env var             | Default | Effect                                          |
+| ------------------- | ------- | ----------------------------------------------- |
+| `MOCK_API_DELAY_MS` | `0`     | Response time in milliseconds for every request |
+| `MOCK_API_DATASET`  | `full`  | Dataset to serve: `full` or `alt`               |
+| `MOCK_API_PORT`     | `4000`  | Port the mock server listens on                 |
+
+#### Quick start: a slow API
+
+Run it in two terminals:
+
+```bash
+# Terminal 1: the mock API, answering every request after 5 seconds
+MOCK_API_DELAY_MS=5000 npm run mock:server
+
+# Terminal 2: the app, fetching airports from the mock API
+npm run dev:mock-server
+```
+
+Open http://localhost:3000. The loading animation shows for about 5 seconds, and the mock
+server logs each request with its response time and dataset:
+
+```text
+Mock Qantas API: http://localhost:4000/flight/refData/airport
+Serving dataset "full" (7189 airports) with a 5000ms response time
+GET /flight/refData/airport -> 200 in 5003ms (dataset: full)
+```
+
+`npm run dev:mock-server` sets `AIRPORTS_UPSTREAM_URL=http://localhost:4000/flight/refData/airport`.
+If you change `MOCK_API_PORT`, start the app with a matching URL instead, for example
+`AIRPORTS_UPSTREAM_URL=http://localhost:5000/flight/refData/airport npm run dev`.
+
+#### Tell the initial load apart from the slow response
+
+The app shows airports saved in the browser straight away, then replaces them when the
+API answers. Switch datasets between loads to see each step:
+
+1. Start both servers with no delay and the full dataset:
+
+   ```bash
+   npm run mock:server        # terminal 1
+   npm run dev:mock-server    # terminal 2
+   ```
+
+2. Open http://localhost:3000 with DevTools > Network > **Disable cache** ticked (the API
+   response is otherwise reused by the browser for 5 minutes). The list shows
+   **7,189 airports** and is saved in the browser.
+3. Without restarting anything, switch the mock to the alt dataset with a 5-second delay:
+
+   ```bash
+   curl -X POST "http://localhost:4000/__mock/settings?dataset=alt&delay=5000"
+   ```
+
+4. Reload the page. The saved **7,189 airports** appear at once with a thin progress bar
+   under the header: that is the initial load, from the browser cache. After 5 seconds the
+   slow response arrives and the list changes to **578 airports** with "(alt)" names.
+5. To watch the full loading screen for the slow response instead, delete the entry in
+   DevTools > Application > Cache Storage (or use a private window) and reload. The loader
+   shows for 5 seconds, then the alt list appears.
+
+Switch back with `curl -X POST "http://localhost:4000/__mock/settings?dataset=full&delay=0"`.
+
+#### Other details
+
+- **Change the defaults while running:** `POST /__mock/settings` takes `dataset` and/or
+  `delay` query parameters; `GET /__mock/settings` shows the current values and the airport
+  count per dataset. Changes last until the server restarts.
+- **Override for one request:** add `?delay=<ms>` and/or `?dataset=<name>`, for example
+  `curl "http://localhost:4000/flight/refData/airport?dataset=alt&delay=8000"`.
+- **Check the server is up:** `curl http://localhost:4000/health`.
+- **Every request is slow:** responses from a custom upstream URL are not kept in the app's
+  1-hour in-memory cache, so each reload waits the full delay.
+- **Very long delays become errors:** the app stops waiting for the upstream after 15s, so a
+  delay of 16000 or more shows the "Airports are unavailable" error screen.
+- **Stopping the mock server** while the app runs makes requests fail the same way.
 
 The normaliser (`src/lib/airports/normalize.ts`) handles quirks found in the real data:
 
